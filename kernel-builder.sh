@@ -1,5 +1,5 @@
 #!/bin/bash
-# Scripts originally created by JonasCardoso <jonascard60@gmail.com> and Xhoni Rexhepi aka PsyMan47 <xhonirexhepi@gmail.com>
+# Scripts originally created by Jonas Cardoso <jonascard60@gmail.com> and Xhoni Rexhepi aka PsyMan47 <xhonirexhepi@gmail.com>
 # Adapted and unified by Henrique Pereira aka Hlcpereira <pereirah2001@gmail.com>
 
 _unset_and_stop() {
@@ -11,20 +11,20 @@ unset DEVICE KERNEL_DIR VARIANT _option_exit
 
 for _u2t in "${@}"
 do
-	if [[ "${_u2t}" == *"a" ]] || [[ "${_u2t}" == *"help" ]]
+	if [[ "${_u2t}" == *"help" ]]
 		then
 		echo "  |"
 		echo "  | Usage:"
-		echo "  | -a | --help      | To show this message"
+		echo "  | --help           | To show this message"
 		echo "  |"
 		echo "  | -e | --eas       | To build EAS kernel"
 		echo "  | -h | --hmp       | To build HMP kernel"
 		echo "  |"
-		echo "  | -0 | --Mi5       | To build only for Mi5/Gemini"
-		echo "  | -1 | --Mi5S      | To build only for Mi5S/Capricorn"
-		echo "  | -2 | --Mi5S Plus | To build only for Mi5S Plus/Natrium"
-		echo "  | -3 | --Mi Mix    | To build only for Mi Mix/Lithium"
-		echo "  | -4 | --Mi Note 2 | To build only for Mi Note 2/Scorpio"
+		echo "  | -0 | --gemini    | To build only for Mi5/Gemini"
+		echo "  | -1 | --capricorn | To build only for Mi5S/Capricorn"
+		echo "  | -2 | --natrium   | To build only for Mi5S Plus/Natrium"
+		echo "  | -3 | --lithium   | To build only for Mi Mix/Lithium"
+		echo "  | -4 | --scorpio   | To build only for Mi Note 2/Scorpio"
 		echo "  |"
 		_option_exit="1"
 		_unset_and_stop
@@ -52,11 +52,11 @@ do
 	fi
         if [[ "${_u2t}" == *"h" ]] || [[ "${_u2t}" == *"hmp" ]]
         then
-                KERNEL_DIR=./oreo-hmp VARIANT="-HMP"
+                KERNEL_DIR=./xiaomi8996-oreo-hmp VARIANT="-HMP"
         fi
         if [[ "${_u2t}" == *"e" ]] || [[ "${_u2t}" == *"eas" ]]
         then
-                KERNEL_DIR=./oreo-eas VARIANT="-EAS"
+                KERNEL_DIR=./xiaomi8996-oreo-eas VARIANT="-EAS"
         fi
 done
 
@@ -75,7 +75,7 @@ echo "  | Building for $DEVICE"
 ANYKERNEL_DIR=./AnyKernel2
 DATE=$(date +"%Y%m%d")
 KERNEL_NAME="KernelX"
-TYPE="-Oreo"
+TYPE="-Oreo_Pie"
 FINAL_ZIP="$KERNEL_NAME""$TYPE""-$DEVICE-""$DATE""$VARIANT".zip
 
 rm $ANYKERNEL_DIR/$DEVICE/Image.gz-dtb
