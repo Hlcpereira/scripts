@@ -50,13 +50,21 @@ do
 	then
 		DEVICE=scorpio DEFCONFIG=scorpio_defconfig
 	fi
+	read -p "Choice: " -n 1 -s x
+	case "${x}" in
+		0 ) name1="gemini";;
+		1 ) name1="capricorn";;
+		2 ) name1="natrium";;
+		3 ) name1="lithium";;
+		4 ) name1="scorpio";;
+	esac
         if [[ "${_u2t}" == *"h" ]] || [[ "${_u2t}" == *"hmp" ]]
         then
-                KERNEL_DIR=./xiaomi8996-oreo-hmp VARIANT="-HMP"
+                KERNEL_DIR=~/Kernelx/xiaomi-msm8996-hmp VARIANT="-HMP"
         fi
         if [[ "${_u2t}" == *"e" ]] || [[ "${_u2t}" == *"eas" ]]
         then
-                KERNEL_DIR=./xiaomi8996-oreo-eas VARIANT="-EAS"
+                KERNEL_DIR=~/Kernelx/xiaomi-msm8996-eas VARIANT="-EAS"
         fi
 done
 
@@ -75,16 +83,16 @@ echo "  | Building for $DEVICE"
 ANYKERNEL_DIR=./AnyKernel2
 DATE=$(date +"%Y%m%d")
 KERNEL_NAME="KernelX"
-TYPE="-Oreo_Pie"
-FINAL_ZIP="$KERNEL_NAME""$TYPE""-$DEVICE-""$DATE""$VARIANT".zip
+FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE""$VARIANT".zip
 
-rm $ANYKERNEL_DIR/$DEVICE/Image.gz-dtb
+rm $ANYKERNEL_DIR/Image.gz-dtb
+rm $ANYKERNEL_DIR/device.prop
 rm $KERNEL_DIR/arch/arm64/boot/Image.gz $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb
 
 export ARCH=arm64
-export CROSS_COMPILE=./toolchain/gcc/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-export CLANG_TRIPLE=aarch64-linux-android-
-export CLANG_PATH=./toolchain/clang/7.0-DragonTC/bin
+export CROSS_COMPILE=~/Kernelx/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+#export CLANG_TRIPLE=aarch64-linux-android-
+#export CLANG_PATH=./toolchain/clang/7.0-DragonTC/bin
 
 cd $KERNEL_DIR
 make clean && make mrproper
@@ -92,7 +100,8 @@ make $DEFCONFIG
 make -j$( nproc --all )
 cd ..
 
-cp $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_DIR/$DEVICE
-cd $ANYKERNEL_DIR/$DEVICE
+echo "name1=$DEVICE" >> $ANYKERNEL_DIR/device.prop
+cp $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_DIR
+cd $ANYKERNEL_DIR
 zip -r9 $FINAL_ZIP * -x *.zip $FINAL_ZIP
-cd ../..
+cd ..
