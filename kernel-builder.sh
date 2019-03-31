@@ -53,17 +53,17 @@ do
 	fi
 	if [[ "${_u2t}" == *"5" ]] || [[ "${_u2t}" == *"oneplus5" ]]
 	then
-		DEVICE=oneplus5 DEFCONFIG=oneplus5_defconfig ANYKERNEL_DIR=./AnyKernel2-oneplus5 KERNEL_DIR=~/Kernelx/oneplus5 \
+		DEVICE=oneplus5 DEFCONFIG=oneplus5_defconfig ANYKERNEL_DIR=./AnyKernel2-oneplus5 KERNEL_DIR=$WORKDIR/oneplus5 \
 		FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE".zip
 	fi
-        if [[ "${_u2t}" == *"h" ]] || [[ "${_u2t}" == *"hmp" ]]
-        then
-                KERNEL_DIR=~/Kernelx/xiaomi-msm8996-hmp VARIANT="-HMP" FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE""$VARIANT".zip
-        fi
-        if [[ "${_u2t}" == *"e" ]] || [[ "${_u2t}" == *"eas" ]]
-        then
-                KERNEL_DIR=~/Kernelx/xiaomi-msm8996-eas VARIANT="-EAS" FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE""$VARIANT".zip
-        fi
+	if [[ "${_u2t}" == *"h" ]] || [[ "${_u2t}" == *"hmp" ]]
+	then
+		KERNEL_DIR=$WORKDIR/xiaomi-msm8996-hmp VARIANT="-HMP" FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE""$VARIANT".zip
+	fi
+	if [[ "${_u2t}" == *"e" ]] || [[ "${_u2t}" == *"eas" ]]
+	then
+		KERNEL_DIR=$WORKDIR/xiaomi-msm8996-eas VARIANT="-EAS" FINAL_ZIP="$KERNEL_NAME""-$DEVICE-""$DATE""$VARIANT".zip
+	fi
 done
 
 # Exit if option is 'help'
@@ -74,13 +74,15 @@ fi
 
 if [ "${DEVICE}" == "" ]
 then
-    _unset_and_stop
+  _unset_and_stop
 fi
 echo "  | Building for $DEVICE"
 
 DATE=$(date +"%Y%m%d")
-KERNEL_NAME="KernelX"
+KERNEL_NAME="PepperKernel"
+WORKDIR=~/PepperKernel
 OUT_DIR=./out
+CLANG_VERSION=r353983
 
 if [ -e "./out" ]
 then
@@ -93,9 +95,10 @@ rm $ANYKERNEL_DIR/device.prop
 rm $KERNEL_DIR/arch/arm64/boot/Image.gz $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb
 
 export ARCH=arm64
-export CROSS_COMPILE=~/Kernelx/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-#export CLANG_TRIPLE=aarch64-linux-android-
-#export CLANG_PATH=./toolchain/clang/7.0-DragonTC/bin
+export CROSS_COMPILE=$WORKDIR/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+export CLANG_TRIPLE=aarch64-linux-gnu-
+export CLANG_PATH=$WORKDIR/prebuilts/clang/host/linux-x86/clang-$CLANG_VERSION/bin
+
 
 cd $KERNEL_DIR
 make clean && make mrproper
@@ -103,7 +106,13 @@ make $DEFCONFIG
 make -j$( nproc --all )
 cd ..
 
-echo "name1=$DEVICE" >> $ANYKERNEL_DIR/device.prop
+if [ "${DEVICE}" == oneplus5 ]
+then
+	echo "name1=cheeseburger" >> $ANYKERNEL_DIR/device.prop
+	echo "name2=dumpling" >> $ANYKERNEL_DIR/device.prop
+else
+	echo "name1=$DEVICE" >> $ANYKERNEL_DIR/device.prop
+fi
 cp $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb $ANYKERNEL_DIR
 cd $ANYKERNEL_DIR
 zip -r9 $FINAL_ZIP * -x *.zip $FINAL_ZIP
